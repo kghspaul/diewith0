@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Die With Zero 財務計算機 Pro (v3.4 清晰對照版)</title>
+    <title>Die With Zero 財務計算機 Pro (v3.6 退休槓桿版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -152,14 +152,19 @@
 
         /* Section Separator Title */
         .dwz-section-title {
-            text-align: center; font-weight: 800; color: var(--accent); margin: 25px 0 15px 0;
+            text-align: center; font-weight: 800; color: var(--accent); margin: 35px 0 15px 0;
             display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.1em;
         }
         .dwz-section-title::before, .dwz-section-title::after {
             content: ''; height: 1px; width: 30px; background: #ffe0b2;
         }
 
-        .chart-wrap { position: relative; height: 400px; width: 100%; margin-top: 20px;}
+        .chart-header {
+            font-size: 0.9em; font-weight: bold; color: #2c3e50; margin: 20px 0 10px 0; 
+            padding-left: 10px; border-left: 4px solid #ddd;
+        }
+
+        .chart-wrap { position: relative; height: 350px; width: 100%; margin-bottom: 30px;}
 
         @media (max-width: 700px) {
             .grid-2, .phase-container, .comparison-box { grid-template-columns: 1fr; flex-direction: column; gap: 15px; }
@@ -172,7 +177,7 @@
 <body>
 
 <div class="container">
-    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v3.4</span></h1>
+    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v3.6</span></h1>
     <p class="subtitle">將您的資產轉換為人生體驗積分・全自動通膨購買力校正</p>
 
     <div style="text-align:center; margin-bottom:10px; font-size:0.85em; color:#95a5a6;">👇 請先選擇您的身分模式</div>
@@ -236,8 +241,12 @@
                 <div class="tag" onclick="setVal('r-rate', 5.5)">穩健領息 (0056)</div>
                 <div class="tag selected" onclick="setVal('r-rate', 4.5)">平衡型 (0050+現金)</div>
                 <div class="tag" onclick="setVal('r-rate', 6.5)">全球配置 (VOO+債)</div>
+                <div class="tag risk-high" onclick="setVal('r-rate', 15)">00631L (~15%)</div>
             </div>
-            <div class="hint">這筆資金在退休期間持續滾動的預期年化報酬。建議設定比歷史平均稍低，以作為安全邊際。</div>
+            <div class="hint">
+                這筆資金在退休期間持續滾動的預期年化報酬。建議設定比歷史平均稍低，以作為安全邊際。<br>
+                <span style="color:#c0392b;">*注意：00631L 波動極大，退休提領期若遇大跌將造成資產永久性損傷(Sequence Risk)，請謹慎使用。</span>
+            </div>
         </div>
 
         <button class="btn-calc btn-retire" onclick="calcRetire()">🚀 計算我的「享樂預算」</button>
@@ -403,9 +412,18 @@
         <div class="phase-container" id="phase-container">
             </div>
 
-        <div class="chart-wrap">
-            <canvas id="myChart"></canvas>
+        <div id="acc-chart-container" style="display:none;">
+            <div class="chart-header">📈 第一階段：資產累積預測 (至退休)</div>
+            <div class="chart-wrap">
+                <canvas id="chartAcc"></canvas>
+            </div>
         </div>
+
+        <div class="chart-header">📉 第二階段：退休後提領與消費 (Die With Zero vs 傳統)</div>
+        <div class="chart-wrap">
+            <canvas id="chartDec"></canvas>
+        </div>
+
         <div class="hint" style="text-align:center; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
             <strong>圖表說明：</strong><br>
             <span style="color:#e67e22">■ 彩色柱狀圖</span>：Die With Zero 建議花費 (年輕多花)。<br>
@@ -423,13 +441,11 @@
         document.getElementById(`tab-${mode}`).classList.add('active');
         document.getElementById('result-area').style.display = 'none';
         
-        // Reset visual selection in presets
         document.querySelectorAll('.presets .tag').forEach(t => t.classList.remove('selected'));
     }
 
     function setVal(id, val) {
         document.getElementById(id).value = val;
-        // Visual feedback for tags
         const presets = event.target.closest('.presets');
         if (presets) {
             presets.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
@@ -460,7 +476,6 @@
     function copyRateToDec() {
         const accRate = document.getElementById('y-rate-acc').value;
         document.getElementById('y-rate-dec').value = accRate;
-        
         const presets = event.target.closest('.presets');
         if (presets) {
             presets.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
@@ -489,7 +504,6 @@
     function PMT_Annuity(principal, realRate, years) {
         const r = realRate / 100;
         if (r === 0) return principal / years;
-        // P * r / (1 - (1+r)^-n)
         return (principal * r) / (1 - Math.pow(1 + r, -years));
     }
 
@@ -642,7 +656,8 @@
     }
 
     // --- Rendering ---
-    let myChart = null;
+    let chartInstanceAcc = null;
+    let chartInstanceDec = null;
 
     function renderResults(startAge, bucketSize, baseUnit, totalRealMoney, mode, nominalFV=0, realFV=0, houseMsg="", chartLabels=[], chartData=[], flatAnnual=0) {
         const area = document.getElementById('result-area');
@@ -675,7 +690,7 @@
         compBox.style.display = 'flex';
         document.getElementById('flat-val').innerText = `$${formatMoney(flatAnnual/12)}`;
 
-        // SHOW THE NEW HEADER
+        // Header Visibility
         document.getElementById('dwz-section-title').style.display = 'flex';
 
         // Phase Cards
@@ -704,18 +719,26 @@
             </div>
         `;
 
-        // Chart
+        // Chart Rendering Logic
+        const accContainer = document.getElementById('acc-chart-container');
+        
+        // Always draw Decumulation Chart (Bottom)
+        drawDecChart(startAge, bucketSize * 3, bucketSize, baseUnit, flatAnnual);
+
+        // If Young Mode, also draw Accumulation Chart (Top)
         if (mode === "年輕人模式" && chartData.length > 0) {
+            accContainer.style.display = 'block';
             drawAccChart(chartLabels, chartData);
         } else {
-            drawDecChart(startAge, bucketSize * 3, bucketSize, baseUnit, flatAnnual);
+            accContainer.style.display = 'none';
         }
     }
 
     function drawAccChart(labels, data) {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
+        const ctx = document.getElementById('chartAcc').getContext('2d');
+        if (chartInstanceAcc) chartInstanceAcc.destroy();
+        
+        chartInstanceAcc = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
@@ -739,8 +762,8 @@
     }
 
     function drawDecChart(startAge, totalYears, bucketSize, baseUnit, flatAnnual) {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        if (myChart) myChart.destroy();
+        const ctx = document.getElementById('chartDec').getContext('2d');
+        if (chartInstanceDec) chartInstanceDec.destroy();
 
         let labels = [];
         let data = [];
@@ -767,7 +790,7 @@
             backgroundColors.push(color);
         }
 
-        myChart = new Chart(ctx, {
+        chartInstanceDec = new Chart(ctx, {
             data: {
                 labels: labels,
                 datasets: [
