@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Die With Zero 財務計算機 Pro (v3.2 完整說明版)</title>
+    <title>Die With Zero 財務計算機 Pro (v3.4 清晰對照版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -11,6 +11,7 @@
             --accent: #e67e22; /* 享樂橘 */
             --growth: #27ae60; /* 累積綠 */
             --house: #8e44ad;   /* 買房紫 */
+            --flat: #7f8c8d;    /* 平滑灰 */
             --bg: #f4f6f8;
             --card-bg: #ffffff;
             --text-light: #636e72;
@@ -72,7 +73,6 @@
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(44,62,80,0.05); }
 
-        /* 輔助說明文字 (Hint) - 這次有加回來！ */
         .hint {
             font-size: 0.85em; color: var(--hint-color); margin-top: 6px; line-height: 1.4;
             padding-left: 2px;
@@ -140,24 +140,44 @@
         .p-amt { font-size: 1.8em; font-weight: 800; margin: 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .p-desc { font-size: 0.85em; opacity: 0.9; margin-top: 5px; }
 
-        .chart-wrap { position: relative; height: 350px; width: 100%; margin-top: 20px;}
+        /* Comparison Box */
+        .comparison-box {
+            background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+            border: 1px solid #e9ecef; display: flex; align-items: center; justify-content: space-between;
+        }
+        .comp-label { font-size: 0.9em; color: #7f8c8d; font-weight: bold; }
+        .comp-val { font-size: 1.4em; font-weight: 800; color: var(--flat); }
+        .comp-note { font-size: 0.8em; color: #95a5a6; }
+        .vs-badge { background: #eee; padding: 5px 10px; border-radius: 50%; font-weight: bold; color: #7f8c8d; font-size: 0.8em;}
+
+        /* Section Separator Title */
+        .dwz-section-title {
+            text-align: center; font-weight: 800; color: var(--accent); margin: 25px 0 15px 0;
+            display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.1em;
+        }
+        .dwz-section-title::before, .dwz-section-title::after {
+            content: ''; height: 1px; width: 30px; background: #ffe0b2;
+        }
+
+        .chart-wrap { position: relative; height: 400px; width: 100%; margin-top: 20px;}
 
         @media (max-width: 700px) {
-            .grid-2, .phase-container { grid-template-columns: 1fr; flex-direction: column; }
+            .grid-2, .phase-container, .comparison-box { grid-template-columns: 1fr; flex-direction: column; gap: 15px; }
             .container { padding: 20px; }
             .p-amt { font-size: 1.5em; }
+            .comparison-box { text-align: center; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v3.2</span></h1>
+    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v3.4</span></h1>
     <p class="subtitle">將您的資產轉換為人生體驗積分・全自動通膨購買力校正</p>
 
     <div style="text-align:center; margin-bottom:10px; font-size:0.85em; color:#95a5a6;">👇 請先選擇您的身分模式</div>
     <div class="tabs">
-        <div class="tab-btn active mode-retire" onclick="switchMode('retire')">👴 我已退休<div style="font-size:0.75em; font-weight:normal; margin-top:3px;">(開始提領與花費)</div></div>
+        <div class="tab-btn active mode-retire" onclick="switchMode('retire')">👴 我已退休<div style="font-size:0.75em; font-weight:normal; margin-top:3px;">(提領模式)</div></div>
         <div class="tab-btn mode-young" onclick="switchMode('young')">🧑 還在努力<div style="font-size:0.75em; font-weight:normal; margin-top:3px;">(資產累積+買房模擬)</div></div>
     </div>
 
@@ -364,6 +384,22 @@
             <div class="hint" style="margin-top:10px;">(這代表：雖然帳面上金額很大，但實際能買到的東西，相當於現在這個金額的價值)</div>
         </div>
         
+        <div id="comparison-block" class="comparison-box" style="display:none;">
+            <div>
+                <div class="comp-label">傳統平滑提領法 (固定花費)</div>
+                <div class="comp-note">若您選擇這筆錢平均花到死...</div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div style="text-align:right;">
+                <div class="comp-val" id="flat-val">$0</div>
+                <div class="comp-note">每月可花 (實質購買力)</div>
+            </div>
+        </div>
+
+        <div id="dwz-section-title" class="dwz-section-title" style="display:none;">
+            👇 Die With Zero 建議提領法 (3-2-1 階梯式)
+        </div>
+
         <div class="phase-container" id="phase-container">
             </div>
 
@@ -371,9 +407,9 @@
             <canvas id="myChart"></canvas>
         </div>
         <div class="hint" style="text-align:center; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-            <strong>3-2-1 法則說明：</strong><br>
-            將退休生活依年數平均分為三階段（黃金、白銀、慢活），花費權重分別為 <strong>3 : 2 : 1</strong>。<br>
-            這鼓勵您在體力最好的「黃金期」多花錢體驗人生，因為那是您轉換效率最高的時候。
+            <strong>圖表說明：</strong><br>
+            <span style="color:#e67e22">■ 彩色柱狀圖</span>：Die With Zero 建議花費 (年輕多花)。<br>
+            <span style="color:#7f8c8d; text-decoration: underline dashed;">-- 灰色虛線</span>：傳統平滑分配 (每年花一樣多)。
         </div>
     </div>
 </div>
@@ -443,14 +479,20 @@
     }
 
     // --- Math Helpers ---
-    function PMT(rate, nper, pv) {
+    function PMT_Loan(rate, nper, pv) {
         if (rate === 0) return pv / (nper * 12);
         const r = rate / 100 / 12;
         const n = nper * 12;
         return (pv * r) / (1 - Math.pow(1 + r, -n));
     }
 
-    // 計算 3-2-1 權重基準單位
+    function PMT_Annuity(principal, realRate, years) {
+        const r = realRate / 100;
+        if (r === 0) return principal / years;
+        // P * r / (1 - (1+r)^-n)
+        return (principal * r) / (1 - Math.pow(1 + r, -years));
+    }
+
     function calculateBaseUnit(principal, realRate, totalYears) {
         const r = realRate / 100;
         const bucketSize = totalYears / 3; 
@@ -460,7 +502,6 @@
             let weight = 1;
             if (t <= bucketSize) weight = 3;
             else if (t <= bucketSize * 2) weight = 2;
-            
             denominator += weight / Math.pow(1 + r, t);
         }
         return principal / denominator;
@@ -478,26 +519,23 @@
 
             if (ageEnd <= ageNow) return alert("登出年齡需大於目前年齡");
             
-            // 1. 純享樂本金
             const principal = assets - buffer;
             if (principal <= 0) return alert("資產不足以保留預備金，請調整金額");
 
-            // 2. 實質報酬率
             const realRate = ((1 + rateNominal/100) / (1 + inflation/100) - 1) * 100;
             const years = ageEnd - ageNow;
 
-            // 3. 計算基準
             const baseUnit = calculateBaseUnit(principal, realRate, years);
+            const flatAnnual = PMT_Annuity(principal, realRate, years);
 
-            // 4. 渲染
-            renderResults(ageNow, years/3, baseUnit, principal, "退休模式");
+            renderResults(ageNow, years/3, baseUnit, principal, "退休模式", 0, 0, "", [], [], flatAnnual);
         } catch (e) {
             alert("計算發生錯誤，請檢查輸入數值");
             console.error(e);
         }
     }
 
-    // --- 年輕人模式邏輯 (含買房迭代) ---
+    // --- 年輕人模式邏輯 ---
     function calcYoung() {
         try {
             const ageNow = getNum('y-age-now');
@@ -509,11 +547,9 @@
             const rateAccMonthly = rateAcc / 12;
             const inflation = getNum('inflation');
             
-            // Validation
             if (ageRetire <= ageNow) return alert("退休年齡必須大於目前年齡");
             if (ageEnd <= ageRetire) return alert("登出年齡必須大於退休年齡");
 
-            // House Params
             const houseEnabled = document.getElementById('house-enabled').checked;
             const houseAge = getNum('h-age');
             const housePrice = getNum('h-price') * 10000;
@@ -530,31 +566,27 @@
 
             const totalMonths = (ageRetire - ageNow) * 12;
             
-            // Loop for Accumulation
             for (let m = 0; m <= totalMonths; m++) {
                 let currentAge = ageNow + Math.floor(m / 12);
                 let currentMonthOfYear = m % 12;
 
-                // 買房判斷：如果是買房年且是一月(或當下立即買)，且尚未買過
                 let isHouseTrigger = (houseEnabled && currentAge === houseAge && currentMonthOfYear === 0);
-                if (houseEnabled && houseAge === ageNow && m === 0) isHouseTrigger = true; // Handle immediate buy
-                if (houseEnabled && houseMsg !== "" && isHouseTrigger) isHouseTrigger = false; // Prevent double buy
+                if (houseEnabled && houseAge === ageNow && m === 0) isHouseTrigger = true; 
+                if (houseEnabled && houseMsg !== "" && isHouseTrigger) isHouseTrigger = false; 
 
                 if (isHouseTrigger) {
                     const downPayment = housePrice * (downPct / 100);
                     
                     if (currentMoney < downPayment) {
                         alert(`警告：在 ${houseAge} 歲時，您的資產累積僅 ${formatMoney(currentMoney/10000)} 萬，不足以支付頭期款 ${formatMoney(downPayment/10000)} 萬。\n請延後買房、降低房價或增加初期投入。`);
-                        return; // Stop execution
+                        return; 
                     }
                     
                     currentMoney -= downPayment;
-                    
-                    // Calc Mortgage
                     const loanAmount = housePrice - downPayment;
-                    const monthlyMortgage = PMT(mortgageRate, mortgageYears, loanAmount);
-                    const extraCost = monthlyMortgage - originalRent; // Difference between mortgage and rent
-                    monthlyInv -= extraCost; // Decrease investment
+                    const monthlyMortgage = PMT_Loan(mortgageRate, mortgageYears, loanAmount);
+                    const extraCost = monthlyMortgage - originalRent; 
+                    monthlyInv -= extraCost; 
 
                     houseMsg = `
                         <strong>🏠 買房衝擊分析：</strong><br>
@@ -566,13 +598,11 @@
                     `;
                 }
 
-                // Record Chart Data (Yearly)
                 if (m % 12 === 0 || m === totalMonths) {
                     chartLabels.push(`${currentAge}歲`);
                     chartData.push(Math.round(currentMoney));
                 }
 
-                // Compounding
                 if (m < totalMonths) { 
                     currentMoney = currentMoney * (1 + rateAccMonthly) + monthlyInv;
                 }
@@ -588,24 +618,22 @@
                 return;
             }
 
-            // Pension
             const pension = getNum('y-pension') * 10000;
             let totalNominal = currentMoney + pension;
-
-            // Discount to PV
             const yearsAcc = ageRetire - ageNow;
             let totalReal = totalNominal / Math.pow(1 + inflation/100, yearsAcc);
 
-            // Decumulation
             const bufferPct = getNum('y-buffer-pct');
             let playMoneyReal = totalReal * (1 - bufferPct/100);
             
             const rateDecNominal = getNum('y-rate-dec');
             const realRateDec = ((1 + rateDecNominal/100) / (1 + inflation/100) - 1) * 100;
             const yearsDec = ageEnd - ageRetire;
+            
             const baseUnit = calculateBaseUnit(playMoneyReal, realRateDec, yearsDec);
+            const flatAnnual = PMT_Annuity(playMoneyReal, realRateDec, yearsDec);
 
-            renderResults(ageRetire, yearsDec/3, baseUnit, playMoneyReal, "年輕人模式", totalNominal, totalReal, houseMsg, chartLabels, chartData);
+            renderResults(ageRetire, yearsDec/3, baseUnit, playMoneyReal, "年輕人模式", totalNominal, totalReal, houseMsg, chartLabels, chartData, flatAnnual);
 
         } catch (e) {
             alert("計算過程發生未知錯誤，請檢查是否有欄位輸入了非數字的符號。");
@@ -616,7 +644,7 @@
     // --- Rendering ---
     let myChart = null;
 
-    function renderResults(startAge, bucketSize, baseUnit, totalRealMoney, mode, nominalFV=0, realFV=0, houseMsg="", chartLabels=[], chartData=[]) {
+    function renderResults(startAge, bucketSize, baseUnit, totalRealMoney, mode, nominalFV=0, realFV=0, houseMsg="", chartLabels=[], chartData=[], flatAnnual=0) {
         const area = document.getElementById('result-area');
         area.style.display = 'block';
         area.scrollIntoView({ behavior: 'smooth' });
@@ -641,6 +669,14 @@
         } else {
             msgDiv.style.display = 'none';
         }
+
+        // Comparison Box
+        const compBox = document.getElementById('comparison-block');
+        compBox.style.display = 'flex';
+        document.getElementById('flat-val').innerText = `$${formatMoney(flatAnnual/12)}`;
+
+        // SHOW THE NEW HEADER
+        document.getElementById('dwz-section-title').style.display = 'flex';
 
         // Phase Cards
         const m1 = (baseUnit * 3) / 12;
@@ -672,7 +708,7 @@
         if (mode === "年輕人模式" && chartData.length > 0) {
             drawAccChart(chartLabels, chartData);
         } else {
-            drawDecChart(startAge, bucketSize * 3, bucketSize, baseUnit);
+            drawDecChart(startAge, bucketSize * 3, bucketSize, baseUnit, flatAnnual);
         }
     }
 
@@ -702,12 +738,13 @@
         });
     }
 
-    function drawDecChart(startAge, totalYears, bucketSize, baseUnit) {
+    function drawDecChart(startAge, totalYears, bucketSize, baseUnit, flatAnnual) {
         const ctx = document.getElementById('myChart').getContext('2d');
         if (myChart) myChart.destroy();
 
         let labels = [];
         let data = [];
+        let dataFlat = [];
         let backgroundColors = [];
 
         for (let i = 0; i < totalYears; i++) {
@@ -720,35 +757,47 @@
                 color = 'rgba(241, 196, 15, 0.7)'; 
             } else if (i < bucketSize * 2) {
                 val = baseUnit * 2;
-                color = 'rgba(149, 165, 166, 0.7)'; 
+                color = 'rgba(189, 195, 199, 0.7)'; 
             } else {
                 val = baseUnit * 1;
                 color = 'rgba(144, 224, 239, 0.7)'; 
             }
             data.push(val);
+            dataFlat.push(flatAnnual);
             backgroundColors.push(color);
         }
 
         myChart = new Chart(ctx, {
-            type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: '年度享樂預算 (今日購買力)',
-                    data: data,
-                    backgroundColor: backgroundColors,
-                    borderWidth: 0,
-                    borderRadius: 4
-                }]
+                datasets: [
+                    {
+                        type: 'line',
+                        label: '傳統平滑提領 (固定)',
+                        data: dataFlat,
+                        borderColor: '#95a5a6',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false,
+                        order: 0
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Die With Zero 建議 (階梯)',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 0,
+                        borderRadius: 4,
+                        order: 1
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true }
-                },
-                plugins: {
-                    legend: { display: false }
+                    y: { beginAtZero: true, title: { display: true, text: '年度預算 (實質購買力)' } }
                 }
             }
         });
