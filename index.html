@@ -209,12 +209,12 @@
         <div class="grid-2">
             <div class="input-group">
                 <label>💰 現有可投資資產 (萬)</label>
-                <input type="number" id="r-assets" value="2000" placeholder="例: 2000">
+                <input type="number" id="r-assets" value="1000" placeholder="例: 1000">
                 <div class="hint">請輸入股票、基金、定存、現金總和。<br>⚠️ <strong>不包含</strong>自住且不打算賣出的房產。</div>
             </div>
             <div class="input-group">
                 <label>🛡️ 尊嚴預備金/遺產 (萬)</label>
-                <input type="number" id="r-buffer" value="500" placeholder="例: 500">
+                <input type="number" id="r-buffer" value="300" placeholder="例: 300">
                 <div class="hint">這筆錢是您的<strong>安全氣囊</strong> (如長照、醫療或留給子女)。此金額在計算時會先被扣除，確保您老後無虞。</div>
             </div>
         </div>
@@ -240,12 +240,12 @@
             <div class="presets">
                 <div class="tag" onclick="setVal('r-rate', 5.5)">穩健領息 (0056)</div>
                 <div class="tag selected" onclick="setVal('r-rate', 4.5)">平衡型 (0050+現金)</div>
-                <div class="tag" onclick="setVal('r-rate', 6.5)">全球配置 (VOO+債)</div>
-                <div class="tag risk-high" onclick="setVal('r-rate', 15)">00631L (~15%)</div>
+                <div class="tag" onclick="setVal('r-rate', 6.5)">美股平衡型 (VOO+短債)</div>
+                <div class="tag risk-high" onclick="setVal('r-rate', 15)">積極型(00631L) (~15%)</div>
             </div>
             <div class="hint">
                 這筆資金在退休期間持續滾動的預期年化報酬。建議設定比歷史平均稍低，以作為安全邊際。<br>
-                <span style="color:#c0392b;">*注意：00631L 波動極大，退休提領期若遇大跌將造成資產永久性損傷(Sequence Risk)，請謹慎使用。</span>
+                <span style="color:#c0392b;">*注意：00631L (元大台灣五十正2) 波動極大，退休提領期若遇大跌易造成資產大幅縮水，故建議手邊保持一到兩年生活費，若退休預到大跌則暫停提領，甚至加碼。</span>
             </div>
         </div>
 
@@ -372,7 +372,7 @@
                         <div class="tag action-btn" onclick="copyRateToDec()">🔄 維持不變 (同累積期)</div>
                         <div class="tag" onclick="setVal('y-rate-dec', 5.5)">穩健 (0056)</div>
                         <div class="tag" onclick="setVal('y-rate-dec', 4.5)">平衡 (0050+現)</div>
-                        <div class="tag" onclick="setVal('y-rate-dec', 6.5)">配置 (VOO+債)</div>
+                        <div class="tag" onclick="setVal('y-rate-dec', 6.5)">配置 (VOO+短債)</div>
                     </div>
                 </div>
             </div>
