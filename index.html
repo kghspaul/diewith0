@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Die With Zero 財務計算機 Pro (v4.2 完全自訂版)</title>
+    <title>Die With Zero 財務計算機 Pro (v4.3 說明優化版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -220,7 +220,7 @@
 <body>
 
 <div class="container">
-    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v4.2 完全自訂版</span></h1>
+    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v4.3 說明優化版</span></h1>
     <p class="subtitle">全自動保守算法・全階段自訂配置・人生體驗積分</p>
 
     <div style="text-align:center; margin-bottom:10px; font-size:0.85em; color:#95a5a6;">👇 請先選擇您的身分模式</div>
@@ -505,18 +505,34 @@
 
     <div class="footer-note">
         <h4>ℹ️ 投資組合預期報酬率演算法說明</h4>
-        <p>本頁採最保守的年複利算法：「忽略月複利，每年只滾動一次」。</p>
-        <p><strong>說明：</strong>在設定年化報酬率（例如 15%）進行定期定額試算時，「月利率」是如何被定義的，將決定最終資產的巨大差異。以下是三種最常見的計算邏輯：</p>
-        <ol>
-            <li><strong>銀行算法 (名目利率)：</strong>假設年利率直接除以 12 就是月利率。實際有效年利率(EAR)會高達 16.07%。適用於房貸、車貸。</li>
-            <li><strong>投資嚴謹算法 (有效利率)：</strong>嚴格定義「一年下來就是剛好 15%」，反推較低的月利率(約1.17%)。這是數學上最精確的 CAGR 定義。</li>
-            <li><strong>簡易估算 (年複利) <span style="color:#e67e22; font-weight:bold;">[本站採用]</span>：</strong>
-                <br>它不計算每個月的複利，而是假設錢投入後，要等到年底才一次性結算利息。
-                <br><strong>邏輯：</strong>忽略月複利，每年只滾動一次。
-                <br><strong>計算：</strong>每月定期定額的錢簡單加總視為年底投入，若預設15%，則以年初本金直接乘以 1.15。
-                <br><strong>特性：</strong>因為它忽略了「資金在一年之中產生的時間價值」，所以算出來的金額會是最少的(最保守)。適用於退休計劃的安全邊際。
-            </li>
-        </ol>
+        
+        <p>本頁採最保守的年複利算法：<span style="color:#e67e22; font-weight:bold;">「忽略月複利，每年只滾動一次」</span>。</p>
+        
+        <p><strong>這台計算機是怎麼算的？為什麼說它「最保守」？</strong><br>
+        為了不讓您對未來太過樂觀，我們在演算法上特別加了<strong>兩道「安全鎖」</strong>：</p>
+
+        <div style="margin-bottom:20px; padding-left:15px; border-left:4px solid #27ae60; background:#f9fbf9; padding:10px;">
+            <strong>🔒 第一道安全鎖 (存錢時)：忽略月複利</strong>
+            <p style="margin:5px 0; font-size:0.95em;">在設定年化報酬率 (例如 15%) 進行定期定額試算時，「月利率」的定義決定了最終資產的差異。以下是三種常見邏輯：</p>
+            <ol style="margin:5px 0 0 0; padding-left:20px; font-size:0.9em; color:#555;">
+                <li style="margin-bottom:5px;"><strong>銀行算法 (最樂觀)：</strong>假設年利率直接除以 12 就是月利率。實際有效年利率(EAR)會高達 16.07%。</li>
+                <li style="margin-bottom:5px;"><strong>投資嚴謹算法 (最精確)：</strong>嚴格定義「一年下來就是剛好 15%」，反推較低的月利率。</li>
+                <li style="margin-bottom:5px;"><strong>簡易估算 (最保守) <span style="color:#e67e22;">[本站採用]</span>：</strong>
+                    不計算每月複利，假設錢投入後，<strong>要等到年底才一次性結算利息</strong>。因為忽略了資金在一年之中產生的時間價值，算出來的金額最少，適合作為退休計劃的安全邊際。
+                </li>
+            </ol>
+        </div>
+
+        <div style="margin-bottom:20px; padding-left:15px; border-left:4px solid #e67e22; background:#fffbf0; padding:10px;">
+            <strong>🔒 第二道安全鎖 (花錢時)：自動扣除通膨</strong>
+            <p style="margin:5px 0 0 0; font-size:0.95em;">
+                在計算退休後「每月可花多少」時，程式會先將報酬率<strong>扣除通膨率</strong> (例如 8% - 2.5% = 5.5%)。確保算出來的金額是<strong>「今日購買力」</strong>，讓您知道退休後實際能買多少東西，而不是看著很大但貶值的數字自我安慰。
+            </p>
+        </div>
+
+        <p style="text-align:center; font-weight:bold; color:#2c3e50;">
+            📝 總結：「寧可現在低估，也不要老了不夠。」<br>透過雙重保守機制，只要這裡算出來顯示 Safe，現實生活中退休成功的機率就會非常高！
+        </p>
     </div>
 </div>
 
