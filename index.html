@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Die With Zero 財務計算機 Pro (v4.3 說明優化版)</title>
+    <title>Die With Zero 財務計算機 Pro (v4.6 淨額顯示版)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -117,11 +117,11 @@
         .tag.risk-high { color: #c0392b; background: #fcebe6; border-color: #fadbd8; }
 
         /* House Section */
-        #house-section {
+        #house-section, #r-loan-section {
             background: #fdfbff; border: 2px dashed #d7bde2; padding: 20px; border-radius: 12px; display: none; margin-bottom: 20px;
         }
-        #house-toggle-text::after { content: ' ▼'; font-size: 0.8em; }
-        #house-section.show { display: block; animation: fadeIn 0.3s; }
+        #house-toggle-text::after, #r-loan-toggle-text::after { content: ' ▼'; font-size: 0.8em; }
+        #house-section.show, #r-loan-section.show { display: block; animation: fadeIn 0.3s; }
 
         /* Buttons */
         .btn-calc {
@@ -220,8 +220,8 @@
 <body>
 
 <div class="container">
-    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v4.3 說明優化版</span></h1>
-    <p class="subtitle">全階段自訂配置・人生體驗加分</p>
+    <h1>Die With Zero 財務計算機 <span style="font-size:0.5em; vertical-align:top; background:#f1f3f5; padding:3px 6px; border-radius:4px; color:#666; border:1px solid #ddd;">PRO v4.6 淨額顯示版</span></h1>
+    <p class="subtitle">全自動保守算法・全階段自訂配置・人生體驗積分</p>
 
     <div style="text-align:center; margin-bottom:10px; font-size:0.85em; color:#95a5a6;">👇 請先選擇您的身分模式</div>
     <div class="tabs">
@@ -262,6 +262,30 @@
             </div>
         </div>
 
+        <div class="section-title house-title" onclick="toggleRetireLoan()">
+            <span id="r-loan-toggle-text">🏠 房屋增貸活化資產 (點擊展開)</span>
+            <input type="checkbox" id="r-loan-enabled" style="display:none">
+        </div>
+        <div id="r-loan-section">
+            <div class="grid-2">
+                <div class="input-group">
+                    <label>💸 增貸金額 (萬)</label>
+                    <input type="number" id="r-loan-amt" value="500">
+                </div>
+                <div class="input-group">
+                    <label>📉 貸款利率 (%)</label>
+                    <input type="number" id="r-loan-rate" value="2.2" step="0.1">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>📅 還款年限 (年)</label>
+                <input type="number" id="r-loan-years" value="20">
+            </div>
+            <div class="hint">
+                說明：此筆資金將自動併入「現有可投資資產」進行投資滾利。計算結果將自動扣除每月應繳本息。
+            </div>
+        </div>
+
         <div class="section-title">Step 2: 設定時間與報酬</div>
         <div class="grid-2">
             <div class="input-group">
@@ -290,6 +314,9 @@
                     <div class="tag" onclick="setVal('r-rate', 5.5)">穩健領息 (0056)</div>
                     <div class="tag selected" onclick="setVal('r-rate', 4.5)">平衡型 (0050/現)</div>
                     <div class="tag" onclick="setVal('r-rate', 6.5)">美股平衡 (VOO/債)</div>
+                    <div class="tag" onclick="setVal('r-rate', 8.0)">積極 (0050)</div>
+                    <div class="tag" onclick="setVal('r-rate', 8.0)">槓桿平衡 (631L/現)</div>
+                    <div class="tag risk-high" onclick="setVal('r-rate', 15.0)">全槓桿 (00631L)</div>
                 </div>
             </div>
 
@@ -435,8 +462,12 @@
                         <span class="presets-label">👇 退休投資風格：</span>
                         <div class="presets">
                             <div class="tag action-btn" onclick="copyRateToDec()">🔄 維持不變</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 5.5)">穩健 (0056)</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 4.5)">平衡 (0050+現)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 5.5)">穩健領息 (0056)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 4.5)">平衡型 (0050/現)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 6.5)">美股平衡 (VOO/債)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 8.0)">積極 (0050)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 8.0)">槓桿平衡 (631L/現)</div>
+                            <div class="tag risk-high" onclick="setVal('y-rate-dec', 15.0)">全槓桿 (00631L)</div>
                         </div>
                     </div>
                 </div>
@@ -469,7 +500,7 @@
         <div id="comparison-block" class="comparison-box" style="display:none;">
             <div>
                 <div class="comp-label">傳統平滑提領法 (固定花費)</div>
-                <div class="comp-note">若您選擇這筆錢平均花到死...</div>
+                <div class="comp-note" id="comp-note-text">每月可花 (實質購買力)</div>
             </div>
             <div class="vs-badge">VS</div>
             <div style="text-align:right;">
@@ -597,7 +628,33 @@
         }
     }
 
+    function toggleRetireLoan() {
+        const section = document.getElementById('r-loan-section');
+        const checkbox = document.getElementById('r-loan-enabled');
+        const text = document.getElementById('r-loan-toggle-text');
+        
+        if (section.style.display === 'block') {
+            section.style.display = 'none';
+            section.classList.remove('show');
+            checkbox.checked = false;
+            text.innerText = "🏠 房屋增貸活化資產 (點擊展開)";
+            text.style.color = "#8e44ad";
+        } else {
+            section.style.display = 'block';
+            setTimeout(() => section.classList.add('show'), 10);
+            checkbox.checked = true;
+            text.innerText = "🏠 房屋增貸活化資產 (已啟用)";
+            text.style.color = "#27ae60";
+        }
+    }
+
     function copyRateToDec() {
+        const accMode = document.getElementById('y-mode-val').value;
+        if (accMode === 'custom') {
+            alert("⚠️ 無法自動帶入：\n累積期目前設定為「自訂投資組合」。\n請手動輸入您退休後的預期報酬率。");
+            return;
+        }
+
         const accRate = document.getElementById('y-rate-acc').value;
         document.getElementById('y-rate-dec').value = accRate;
         const presets = event.target.closest('.presets');
@@ -749,11 +806,37 @@
     // --- 退休模式邏輯 ---
     function calcRetire() {
         try {
-            const assets = getNum('r-assets') * 10000;
+            let assets = getNum('r-assets') * 10000;
             const buffer = getNum('r-buffer') * 10000;
             const ageNow = getNum('r-age-now');
             const ageEnd = getNum('r-age-end');
             const inflation = getNum('inflation');
+
+            // 處理增貸
+            const loanEnabled = document.getElementById('r-loan-enabled').checked;
+            let monthlyLoanPay = 0;
+            let loanMsg = "";
+
+            if (loanEnabled) {
+                const loanAmt = getNum('r-loan-amt') * 10000;
+                const loanRate = getNum('r-loan-rate');
+                const loanYears = getNum('r-loan-years');
+
+                // 1. 將增貸金額加入現有資產 (Inflow)
+                assets += loanAmt;
+
+                // 2. 計算每月應還本息 (Outflow)
+                if (loanAmt > 0 && loanYears > 0) {
+                    monthlyLoanPay = PMT_Loan(loanRate, loanYears, loanAmt);
+                }
+
+                loanMsg = `
+                    <strong>🏠 已啟用房屋增貸：</strong><br>
+                    增貸金額 <strong>$${formatMoney(loanAmt/10000)}萬</strong> 已併入本金滾利。<br>
+                    每月需繳房貸本息約 <strong>$${formatMoney(monthlyLoanPay)}</strong>。<br>
+                    下方計算結果已自動扣除此筆還款金額。
+                `;
+            }
 
             // 取得報酬率 (自訂或簡單)
             const rateNominal = getPortfolioRate('r', 'r-mode-val', 'r-rate', 'r-port');
@@ -776,7 +859,8 @@
             const flatAnnual = PMT_Annuity_Annual(principal, realRate, years);
 
             // 轉成月顯示 (直接除以12)
-            renderResults(ageNow, years/3, baseUnitAnnual/12, principal, "退休模式", 0, 0, "", [], [], flatAnnual);
+            // 將 loanMsg 傳入，並傳入 monthlyLoanPay 作為扣除項
+            renderResults(ageNow, years/3, baseUnitAnnual/12, principal, "退休模式", 0, 0, loanMsg, [], [], flatAnnual, monthlyLoanPay);
         } catch (e) {
             alert("計算發生錯誤，請檢查輸入數值");
             console.error(e);
@@ -817,6 +901,7 @@
             let chartLabels = [];
             let houseMsg = "";
             let isBankrupt = false;
+            let activeMortgagePayment = 0; // 用來記錄計算出的房貸月付金
 
             // 保守演算法：以「年」為單位進行迴圈
             const totalYearsAcc = ageRetire - ageNow;
@@ -838,6 +923,8 @@
                     currentMoney -= downPayment;
                     const loanAmount = housePrice - downPayment;
                     const monthlyMortgage = PMT_Loan(mortgageRate, mortgageYears, loanAmount);
+                    activeMortgagePayment = monthlyMortgage; // 記錄下來，供退休期使用
+
                     const extraCost = monthlyMortgage - originalRent; 
                     monthlyInv -= extraCost; 
 
@@ -893,7 +980,16 @@
             const baseUnitAnnual = calculateBaseUnit_Annual(playMoneyReal, realRateDec, yearsDec);
             const flatAnnual = PMT_Annuity_Annual(playMoneyReal, realRateDec, yearsDec);
 
-            renderResults(ageRetire, yearsDec/3, baseUnitAnnual/12, playMoneyReal, "年輕人模式", totalNominal, totalReal, houseMsg, chartLabels, chartData, flatAnnual);
+            // 計算退休時是否還有房貸要繳 (Young Mode Logic)
+            let deduction = 0;
+            const mortgageEndAge = houseAge + mortgageYears;
+            if (houseEnabled && mortgageEndAge > ageRetire) {
+                // 如果退休後房貸還沒繳完，設定扣除額 (為求簡單比較，此處將顯示扣除房貸後的淨額)
+                deduction = activeMortgagePayment;
+            }
+
+            // 將 deduction 傳入 renderResults
+            renderResults(ageRetire, yearsDec/3, baseUnitAnnual/12, playMoneyReal, "年輕人模式", totalNominal, totalReal, houseMsg, chartLabels, chartData, flatAnnual, deduction);
 
         } catch (e) {
             alert("計算過程發生錯誤");
@@ -905,7 +1001,7 @@
     let chartInstanceAcc = null;
     let chartInstanceDec = null;
 
-    function renderResults(startAge, bucketSize, baseUnitMonthly, totalRealMoney, mode, nominalFV=0, realFV=0, houseMsg="", chartLabels=[], chartData=[], flatAnnual=0) {
+    function renderResults(startAge, bucketSize, baseUnitMonthly, totalRealMoney, mode, nominalFV=0, realFV=0, houseMsg="", chartLabels=[], chartData=[], flatAnnual=0, monthlyFixedDeduction=0) {
         const area = document.getElementById('result-area');
         area.style.display = 'block';
         area.scrollIntoView({ behavior: 'smooth' });
@@ -931,18 +1027,34 @@
             msgDiv.style.display = 'none';
         }
 
+        // Deduction Note String
+        const deductionNote = monthlyFixedDeduction > 0 ? "<div style='font-size:0.8em; color:#c0392b; margin-top:2px;'>(已扣除房貸)</div>" : "";
+
         // Comparison Box
         const compBox = document.getElementById('comparison-block');
         compBox.style.display = 'flex';
-        document.getElementById('flat-val').innerText = `$${formatMoney(flatAnnual/12)}`; // Annual / 12
+        // 傳統平滑法也要扣除固定還款
+        let flatMonthly = (flatAnnual/12) - monthlyFixedDeduction;
+        if (flatMonthly < 0) flatMonthly = 0;
+        document.getElementById('flat-val').innerText = `$${formatMoney(flatMonthly)}`; 
+        
+        // Update comparison box note
+        document.getElementById('comp-note-text').innerHTML = `每月可花 (實質購買力)${deductionNote}`;
 
         // Header Visibility
         document.getElementById('dwz-section-title').style.display = 'flex';
 
         // Phase Cards
-        const m1 = baseUnitMonthly * 3;
-        const m2 = baseUnitMonthly * 2;
-        const m3 = baseUnitMonthly * 1;
+        // 這裡需要扣除 monthlyFixedDeduction
+        let m1 = (baseUnitMonthly * 3) - monthlyFixedDeduction;
+        let m2 = (baseUnitMonthly * 2) - monthlyFixedDeduction;
+        let m3 = (baseUnitMonthly * 1) - monthlyFixedDeduction;
+        
+        // 避免顯示負數
+        if (m1 < 0) m1 = 0;
+        if (m2 < 0) m2 = 0;
+        if (m3 < 0) m3 = 0;
+
         const p1End = Math.floor(startAge + bucketSize);
         const p2End = Math.floor(startAge + bucketSize * 2);
         const p3End = Math.floor(startAge + bucketSize * 3);
@@ -951,17 +1063,17 @@
             <div class="phase-card p-gold">
                 <div class="p-title">🚀 黃金期 (${startAge} - ${p1End}歲)</div>
                 <div class="p-amt">$${formatMoney(m1)}</div>
-                <div class="p-desc">每月可花 (實質購買力)</div>
+                <div class="p-desc">每月可花${deductionNote}</div>
             </div>
             <div class="phase-card p-silver">
                 <div class="p-title">🚢 白銀期 (${p1End} - ${p2End}歲)</div>
                 <div class="p-amt">$${formatMoney(m2)}</div>
-                <div class="p-desc">每月可花</div>
+                <div class="p-desc">每月可花${deductionNote}</div>
             </div>
             <div class="phase-card p-bronze">
                 <div class="p-title">🏡 慢活期 (${p2End} - ${p3End}歲)</div>
                 <div class="p-amt">$${formatMoney(m3)}</div>
-                <div class="p-desc">每月可花</div>
+                <div class="p-desc">每月可花${deductionNote}</div>
             </div>
         `;
 
@@ -969,7 +1081,7 @@
         const accContainer = document.getElementById('acc-chart-container');
         
         // Always draw Decumulation Chart (Bottom)
-        drawDecChart(startAge, bucketSize * 3, bucketSize, baseUnitMonthly, flatAnnual/12);
+        drawDecChart(startAge, bucketSize * 3, bucketSize, baseUnitMonthly, flatAnnual/12, monthlyFixedDeduction);
 
         // If Young Mode, also draw Accumulation Chart (Top)
         if (mode === "年輕人模式" && chartData.length > 0) {
@@ -1007,7 +1119,7 @@
         });
     }
 
-    function drawDecChart(startAge, totalYears, bucketSize, baseUnitMonthly, flatMonthly) {
+    function drawDecChart(startAge, totalYears, bucketSize, baseUnitMonthly, flatMonthly, deduction) {
         const ctx = document.getElementById('chartDec').getContext('2d');
         if (chartInstanceDec) chartInstanceDec.destroy();
 
@@ -1016,23 +1128,29 @@
         let dataFlat = [];
         let backgroundColors = [];
 
+        // 傳統平滑法扣除貸款
+        let adjustedFlat = flatMonthly - deduction;
+        if (adjustedFlat < 0) adjustedFlat = 0;
+
         for (let i = 0; i < totalYears; i++) {
             labels.push(`${startAge + i}歲`);
             
             let val = 0;
             let color = '';
             if (i < bucketSize) {
-                val = baseUnitMonthly * 3;
+                val = (baseUnitMonthly * 3) - deduction;
                 color = 'rgba(241, 196, 15, 0.7)'; 
             } else if (i < bucketSize * 2) {
-                val = baseUnitMonthly * 2;
+                val = (baseUnitMonthly * 2) - deduction;
                 color = 'rgba(189, 195, 199, 0.7)'; 
             } else {
-                val = baseUnitMonthly * 1;
+                val = (baseUnitMonthly * 1) - deduction;
                 color = 'rgba(144, 224, 239, 0.7)'; 
             }
+            if (val < 0) val = 0;
+
             data.push(val);
-            dataFlat.push(flatMonthly);
+            dataFlat.push(adjustedFlat);
             backgroundColors.push(color);
         }
 
@@ -1075,4 +1193,3 @@
 
 </body>
 </html>
-
