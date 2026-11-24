@@ -115,6 +115,7 @@
         .tag.selected { background: #dbe4ff; color: #3b5bdb; border-color: #bac8ff; font-weight: bold; }
         .tag.action-btn { background: #fff8e1; color: #b7791f; border-color: #ffeeba; }
         .tag.risk-high { color: #c0392b; background: #fcebe6; border-color: #fadbd8; }
+        .tag.risk-high.selected { border-color: #c0392b; box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.25); font-weight: bold; }
 
         /* Floating Tooltip */
         #floating-tooltip {
@@ -319,7 +320,7 @@
             </div>
             <div class="input-group">
                 <label>🏁 人生登出年齡 (歲)</label>
-                <input type="number" id="r-age-end" value="85">
+                <input type="number" id="r-age-end" value="99">
             </div>
         </div>
 
@@ -454,7 +455,7 @@
         <div class="grid-2">
             <div class="input-group">
                 <label>🏦 目前流動資產 (萬)</label>
-                <input type="number" id="y-current" value="100">
+                <input type="number" id="y-current" value="50">
             </div>
             <div class="input-group">
                 <label>💵 每月定期定額投入 (元)</label>
@@ -473,7 +474,7 @@
 
             <div id="y-simple-block">
                 <div class="grid-2" style="grid-template-columns: 1fr 3fr; gap:15px;">
-                    <input type="number" id="y-rate-acc" value="8.0" step="0.05">
+                    <input type="number" id="y-rate-acc" value="15.0" step="0.05">
                     <div>
                         <span class="presets-label">👇 參考：</span>
                         <div class="presets">
@@ -483,7 +484,7 @@
                             <div class="tag" onclick="setVal('y-rate-acc', 8.0)" data-tooltip="100% 投入台股大盤市值型 ETF（如 0050）。長期成長性佳，但須承受空頭時期約 30%–50% 的帳面回檔波動。">積極 (0050)</div>
                             <div class="tag" onclick="setVal('y-rate-acc', 9.0)" data-tooltip="50% 00631L（50正2）+ 50% 定存，每年再平衡一次（預設年化報酬 9%）。以一半資金達成接近 100% 台股大盤的曝險與報酬，同時保有高比例定存現金可應對股災或提領需求。">台股槓桿平衡 (00631L/定存)</div>
                             <div class="tag" onclick="setVal('y-rate-acc', 9.25)" data-tooltip="50% QLD（那斯達克 2 倍）[15%] + 50% 美股短債（SGOV/SHV）[3.5%]，每年再平衡一次，加權預期報酬為 9.25%。以一半資金取得接近 100% 那斯達克大盤曝險，同時以美股短債提供息收與股災防禦力。">美股槓桿平衡 (QLD/短債)</div>
-                            <div class="tag risk-high" onclick="setVal('y-rate-acc', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
+                            <div class="tag risk-high selected" onclick="setVal('y-rate-acc', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
                             <div class="tag risk-high" onclick="setVal('y-rate-acc', 15.0)" data-tooltip="100% 投入那斯達克 100 指數 2 倍槓桿 ETF（QLD）。受惠美國科技股長期成長，多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">美股全槓桿 (QLD)</div>
                         </div>
                     </div>
@@ -580,7 +581,7 @@
 
         <div class="input-group">
             <label>👴 預估退休金一次領總額 (萬，退休當年的未來名目金額)</label>
-            <input type="number" id="y-pension" value="200" placeholder="選填，例如 200">
+            <input type="number" id="y-pension" value="0" placeholder="選填，例如 200">
             <div class="hint">⚠️ 請填<strong>退休那一年實際領到的名目金額</strong>，程式會再依通膨折算成今日購買力。若您手上的數字是「以今日物價計算」的金額，請先乘上 (1+通膨率)^距退休年數 再填入，否則會被重複折現。</div>
         </div>
 
@@ -596,7 +597,7 @@
                 </div>
                 <div class="input-group">
                     <label>🏷️ 房屋總價 (萬)</label>
-                    <input type="number" id="h-price" value="1500">
+                    <input type="number" id="h-price" value="1800">
                 </div>
             </div>
             <div class="grid-2">
@@ -614,7 +615,7 @@
             </div>
             <div class="input-group">
                 <label>🏠 原本的房租預算 (元/月)</label>
-                <input type="number" id="h-rent" value="15000">
+                <input type="number" id="h-rent" value="8000">
             </div>
         </div>
 
@@ -622,11 +623,11 @@
         <div class="grid-2">
              <div class="input-group">
                 <label>🏁 人生登出年齡</label>
-                <input type="number" id="y-age-end" value="85">
+                <input type="number" id="y-age-end" value="99">
             </div>
             <div class="input-group">
                 <label>🛡️ 退休後保留預備金 (%)</label>
-                <input type="number" id="y-buffer-pct" value="20">
+                <input type="number" id="y-buffer-pct" value="5">
             </div>
         </div>
 
@@ -641,7 +642,7 @@
 
              <div id="y-dec-simple-block">
                 <div class="grid-2" style="grid-template-columns: 1fr 3fr; gap:15px;">
-                    <input type="number" id="y-rate-dec" value="4.5" step="0.05">
+                    <input type="number" id="y-rate-dec" value="15.0" step="0.05">
                     <div>
                         <span class="presets-label">👇 退休投資風格：</span>
                         <div class="presets">
@@ -652,7 +653,7 @@
                             <div class="tag" onclick="setVal('y-rate-dec', 8.0)" data-tooltip="100% 投入台股大盤市值型 ETF（如 0050）。長期成長性佳，但須承受空頭時期約 30%–50% 的帳面回檔波動。">積極 (0050)</div>
                             <div class="tag" onclick="setVal('y-rate-dec', 9.0)" data-tooltip="50% 00631L（50正2）+ 50% 定存，每年再平衡一次（預設年化報酬 9%）。以一半資金達成接近 100% 台股大盤的曝險與報酬，同時保有高比例定存現金可應對股災或提領需求。">台股槓桿平衡 (00631L/定存)</div>
                             <div class="tag" onclick="setVal('y-rate-dec', 9.25)" data-tooltip="50% QLD（那斯達克 2 倍）[15%] + 50% 美股短債（SGOV/SHV）[3.5%]，每年再平衡一次，加權預期報酬為 9.25%。以一半資金取得接近 100% 那斯達克大盤曝險，同時以美股短債提供息收與股災防禦力。">美股槓桿平衡 (QLD/短債)</div>
-                            <div class="tag risk-high" onclick="setVal('y-rate-dec', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
+                            <div class="tag risk-high selected" onclick="setVal('y-rate-dec', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
                             <div class="tag risk-high" onclick="setVal('y-rate-dec', 15.0)" data-tooltip="100% 投入那斯達克 100 指數 2 倍槓桿 ETF（QLD）。受惠美國科技股長期成長，多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">美股全槓桿 (QLD)</div>
                         </div>
                     </div>
