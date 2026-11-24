@@ -116,6 +116,30 @@
         .tag.action-btn { background: #fff8e1; color: #b7791f; border-color: #ffeeba; }
         .tag.risk-high { color: #c0392b; background: #fcebe6; border-color: #fadbd8; }
 
+        /* Floating Tooltip */
+        #floating-tooltip {
+            position: fixed;
+            z-index: 9999;
+            max-width: 320px;
+            padding: 10px 14px;
+            background: rgba(44, 62, 80, 0.96);
+            color: #ffffff;
+            font-size: 0.85em;
+            line-height: 1.5;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            visibility: hidden;
+        }
+        #floating-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
         /* House Section */
         #house-section, #r-loan-section {
             background: #fdfbff; border: 2px dashed #d7bde2; padding: 20px; border-radius: 12px; display: none; margin-bottom: 20px;
@@ -309,15 +333,18 @@
             </div>
 
             <div id="r-simple-block">
-                <input type="number" id="r-rate" value="4.5" step="0.1">
+                <input type="number" id="r-rate" value="4.5" step="0.05">
                 <span class="presets-label">👇 快速帶入：</span>
                 <div class="presets">
-                    <div class="tag" onclick="setVal('r-rate', 5.5)">高股息(利息再投入,不能領) (0056)</div>
-                    <div class="tag" onclick="setVal('r-rate', 4.5)">平衡型 (0050/現)</div>
-                    <div class="tag" onclick="setVal('r-rate', 6.5)">美股平衡 (VOO/債)</div>
-                    <div class="tag" onclick="setVal('r-rate', 8.0)">積極 (0050)</div>
-                    <div class="tag" onclick="setVal('r-rate', 8.0)">槓桿平衡 (631L/現)</div>
-                    <div class="tag risk-high" onclick="setVal('r-rate', 15.0)">全槓桿 (00631L)</div>
+                    <div class="tag" onclick="setVal('r-rate', 5.5)" data-tooltip="以 0056 等高股息 ETF 為例，長期含息總報酬率保守抓約 5.5%（模型上請直接填「含息總報酬率」）。⚠️ 注意：累積期必須將配息全數再投入才能達到此報酬，若領息花掉，長期純股價年化成長僅約 2%；退休提領期則由系統統一試算每年總預算（含配息＋賣股），直接套用含息總報酬率即可。">高股息(利息再投入,不能領) (0056)</div>
+                    <div class="tag" onclick="setVal('r-rate', 4.5)" data-tooltip="50% 0050 + 50% 現金（或定存）。透過保留一半現金大幅緩衝股市震盪，適合風險承受度較低、重視資產安穩的保守型投資人。">平衡型 (0050/現)</div>
+                    <div class="tag" onclick="setVal('r-rate', 6.5)" data-tooltip="股債 2:1 配置（約 67% VOO 標普500 [8%] + 33% 美股短債 [3.5%]，加權報酬正好 6.5%）。兼顧美國市場長期成長與債券防禦力，是退休規劃的常見基準。">美股平衡 (VOO/債)</div>
+                    <div class="tag" onclick="setVal('r-rate', 8.0)" data-tooltip="100% 投入台股大盤市值型 ETF（如 0050）。長期成長性佳，但須承受空頭時期約 30%–50% 的帳面回檔波動。">積極 (0050)</div>
+                    <div class="tag" onclick="setVal('r-rate', 9.0)" data-tooltip="50% 00631L（50正2）+ 50% 定存，每年再平衡一次（預設年化報酬 9%）。以一半資金達成接近 100% 台股大盤的曝險與報酬，同時保有高比例定存現金可應對股災或提領需求。">台股槓桿平衡 (00631L/定存)</div>
+                    <div class="tag" onclick="setVal('r-rate', 9.25)" data-tooltip="50% QLD（那斯達克 2 倍）[15%] + 50% 美股短債（SGOV/SHV）[3.5%]，每年再平衡一次，加權預期報酬為 9.25%。以一半資金取得接近 100% 那斯達克大盤曝險，同時以美股短債提供息收與股災防禦力。">美股槓桿平衡 (QLD/短債)</div>
+                    <div class="tag risk-high" onclick="setVal('r-rate', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
+                    <div class="tag risk-high" onclick="setVal('r-rate', 15.0)" data-tooltip="100% 投入那斯達克 100 指數 2 倍槓桿 ETF（QLD）。受惠美國科技股長期成長，多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">美股全槓桿 (QLD)</div>
+                </div>
                 </div>
             </div>
 
@@ -329,7 +356,7 @@
                     <td>
                         <select class="r-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -344,7 +371,7 @@
                     <td>
                         <select class="r-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -359,7 +386,7 @@
                     <td>
                         <select class="r-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -374,7 +401,7 @@
                     <td>
                         <select class="r-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -389,7 +416,7 @@
                     <td>
                         <select class="r-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -404,6 +431,7 @@
             </div>
 
             <div class="hint">
+                <strong>💡 填寫原則：</strong>模型上請直接填「<strong>含息總報酬率</strong>」（系統會自動統算每年可花預算，包含配息與賣股）。<br>
                 <span style="color:#27ae60; font-weight:bold;">★ 保守演算法：累積期忽略月複利；提領期假設「每年年初一次領出整年預算」，比實際按月陸續花費更保守。</span>
             </div>
         </div>
@@ -426,7 +454,7 @@
 
         <div class="grid-2">
             <div class="input-group">
-                <label>🏦 目前流動資產 (萬) (股票、基金、定存、現金總和)</label>
+                <label>🏦 目前流動資產 (萬)</label>
                 <input type="number" id="y-current" value="100">
             </div>
             <div class="input-group">
@@ -446,14 +474,19 @@
 
             <div id="y-simple-block">
                 <div class="grid-2" style="grid-template-columns: 1fr 3fr; gap:15px;">
-                    <input type="number" id="y-rate-acc" value="8.0" step="0.1">
+                    <input type="number" id="y-rate-acc" value="8.0" step="0.05">
                     <div>
                         <span class="presets-label">👇 參考：</span>
                         <div class="presets">
-                            <div class="tag" onclick="setVal('y-rate-acc', 8)">0050 (~8%)</div>
-                            <div class="tag" onclick="setVal('y-rate-acc', 8)">VOO (~8%)</div>
-                            <div class="tag" onclick="setVal('y-rate-acc', 10)">QQQ (~10%)</div>
-                            <div class="tag risk-high" onclick="setVal('y-rate-acc', 15)">00631L (~15%)</div>
+                            <div class="tag" onclick="setVal('y-rate-acc', 5.5)" data-tooltip="以 0056 等高股息 ETF 為例，長期含息總報酬率保守抓約 5.5%（模型上請直接填「含息總報酬率」）。⚠️ 注意：累積期必須將配息全數再投入才能達到此報酬，若領息花掉，長期純股價年化成長僅約 2%；退休提領期則由系統統一試算每年總預算（含配息＋賣股），直接套用含息總報酬率即可。">高股息(利息再投入,不能領) (0056)</div>
+                            <div class="tag" onclick="setVal('y-rate-acc', 4.5)" data-tooltip="50% 0050 + 50% 現金（或定存）。透過保留一半現金大幅緩衝股市震盪，適合風險承受度較低、重視資產安穩的保守型投資人。">平衡型 (0050/現)</div>
+                            <div class="tag" onclick="setVal('y-rate-acc', 6.5)" data-tooltip="股債 2:1 配置（約 67% VOO 標普500 [8%] + 33% 美股短債 [3.5%]，加權報酬正好 6.5%）。兼顧美國市場長期成長與債券防禦力，是退休規劃的常見基準。">美股平衡 (VOO/債)</div>
+                            <div class="tag" onclick="setVal('y-rate-acc', 8.0)" data-tooltip="100% 投入台股大盤市值型 ETF（如 0050）。長期成長性佳，但須承受空頭時期約 30%–50% 的帳面回檔波動。">積極 (0050)</div>
+                            <div class="tag" onclick="setVal('y-rate-acc', 9.0)" data-tooltip="50% 00631L（50正2）+ 50% 定存，每年再平衡一次（預設年化報酬 9%）。以一半資金達成接近 100% 台股大盤的曝險與報酬，同時保有高比例定存現金可應對股災或提領需求。">台股槓桿平衡 (00631L/定存)</div>
+                            <div class="tag" onclick="setVal('y-rate-acc', 9.25)" data-tooltip="50% QLD（那斯達克 2 倍）[15%] + 50% 美股短債（SGOV/SHV）[3.5%]，每年再平衡一次，加權預期報酬為 9.25%。以一半資金取得接近 100% 那斯達克大盤曝險，同時以美股短債提供息收與股災防禦力。">美股槓桿平衡 (QLD/短債)</div>
+                            <div class="tag risk-high" onclick="setVal('y-rate-acc', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
+                            <div class="tag risk-high" onclick="setVal('y-rate-acc', 15.0)" data-tooltip="100% 投入那斯達克 100 指數 2 倍槓桿 ETF（QLD）。受惠美國科技股長期成長，多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">美股全槓桿 (QLD)</div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -467,7 +500,7 @@
                     <td>
                         <select class="y-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -482,7 +515,7 @@
                     <td>
                         <select class="y-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -497,7 +530,7 @@
                     <td>
                         <select class="y-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -512,7 +545,7 @@
                     <td>
                         <select class="y-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -527,7 +560,7 @@
                     <td>
                         <select class="y-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -542,6 +575,7 @@
                 <div class="sum-warning" id="y-sum-warning">⚠️ 警告：目前配置比例總和為 0%，必須等於 100% 才能計算。</div>
             </div>
             <div class="hint">
+                <strong>💡 填寫原則：</strong>模型上請直接填「<strong>含息總報酬率</strong>」（前提為累積期配息全數再投入）。<br>
                 <span style="color:#27ae60; font-weight:bold;">★ 保守演算法：定期定額視為年底一次投入，忽略月複利。</span>
             </div>
         </div>
@@ -609,17 +643,20 @@
 
              <div id="y-dec-simple-block">
                 <div class="grid-2" style="grid-template-columns: 1fr 3fr; gap:15px;">
-                    <input type="number" id="y-rate-dec" value="4.5" step="0.1">
+                    <input type="number" id="y-rate-dec" value="4.5" step="0.05">
                     <div>
                         <span class="presets-label">👇 退休投資風格：</span>
                         <div class="presets">
-                            <div class="tag action-btn" onclick="copyRateToDec()">🔄 維持不變</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 5.5)">高股息(利息再投入,不能領) (0056)</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 4.5)">平衡型 (0050/現)</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 6.5)">美股平衡 (VOO/債)</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 8.0)">積極 (0050)</div>
-                            <div class="tag" onclick="setVal('y-rate-dec', 8.0)">槓桿平衡 (631L/現)</div>
-                            <div class="tag risk-high" onclick="setVal('y-rate-dec', 15.0)">全槓桿 (00631L)</div>
+                            <div class="tag action-btn" onclick="copyRateToDec()" data-tooltip="一鍵帶入上方「累積期預期報酬率」的數值（僅在累積期為「一般設定」時適用）。">🔄 維持不變</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 5.5)" data-tooltip="以 0056 等高股息 ETF 為例，長期含息總報酬率保守抓約 5.5%（模型上請直接填「含息總報酬率」）。⚠️ 注意：累積期必須將配息全數再投入才能達到此報酬，若領息花掉，長期純股價年化成長僅約 2%；退休提領期則由系統統一試算每年總預算（含配息＋賣股），直接套用含息總報酬率即可。">高股息(利息再投入,不能領) (0056)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 4.5)" data-tooltip="50% 0050 + 50% 現金（或定存）。透過保留一半現金大幅緩衝股市震盪，適合風險承受度較低、重視資產安穩的保守型投資人。">平衡型 (0050/現)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 6.5)" data-tooltip="股債 2:1 配置（約 67% VOO 標普500 [8%] + 33% 美股短債 [3.5%]，加權報酬正好 6.5%）。兼顧美國市場長期成長與債券防禦力，是退休規劃的常見基準。">美股平衡 (VOO/債)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 8.0)" data-tooltip="100% 投入台股大盤市值型 ETF（如 0050）。長期成長性佳，但須承受空頭時期約 30%–50% 的帳面回檔波動。">積極 (0050)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 9.0)" data-tooltip="50% 00631L（50正2）+ 50% 定存，每年再平衡一次（預設年化報酬 9%）。以一半資金達成接近 100% 台股大盤的曝險與報酬，同時保有高比例定存現金可應對股災或提領需求。">台股槓桿平衡 (00631L/定存)</div>
+                            <div class="tag" onclick="setVal('y-rate-dec', 9.25)" data-tooltip="50% QLD（那斯達克 2 倍）[15%] + 50% 美股短債（SGOV/SHV）[3.5%]，每年再平衡一次，加權預期報酬為 9.25%。以一半資金取得接近 100% 那斯達克大盤曝險，同時以美股短債提供息收與股災防禦力。">美股槓桿平衡 (QLD/短債)</div>
+                            <div class="tag risk-high" onclick="setVal('y-rate-dec', 15.0)" data-tooltip="100% 投入台灣 50 正 2（00631L）。多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">台股全槓桿 (00631L)</div>
+                            <div class="tag risk-high" onclick="setVal('y-rate-dec', 15.0)" data-tooltip="100% 投入那斯達克 100 指數 2 倍槓桿 ETF（QLD）。受惠美國科技股長期成長，多頭時複利爆發力極強，但空頭時可能面臨 60%–70% 以上的劇烈跌幅，⚠️ 僅適合能承受極高風險者。">美股全槓桿 (QLD)</div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -633,7 +670,7 @@
                     <td>
                         <select class="y-dec-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -648,7 +685,7 @@
                     <td>
                         <select class="y-dec-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -663,7 +700,7 @@
                     <td>
                         <select class="y-dec-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -678,7 +715,7 @@
                     <td>
                         <select class="y-dec-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -693,7 +730,7 @@
                     <td>
                         <select class="y-dec-port-select" onchange="updateRate(this)">
                             <option value="">-- 請選擇 --</option>
-                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="12">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
+                            <option value="8">0050 (元大台灣50)</option><option value="5.5">0056 (元大高股息)</option><option value="15">00631L (50正2)</option><option value="8">VOO (標普500)</option><option value="10">QQQ (那斯達克)</option><option value="15">QLD (那斯達克2倍)</option><option value="15">TQQQ (那斯達克3倍)</option><option value="1">現金 (即定存)</option><option value="3.5">美股短債 (SGOV/SHV)</option>
                         </select>
                     </td>
                     <td>
@@ -709,6 +746,7 @@
             </div>
 
             <div class="hint">
+                <strong>💡 填寫原則：</strong>模型上請直接填「<strong>含息總報酬率</strong>」（系統會自動統算每年可花預算，包含配息與賣股）。<br>
                 <span style="color:#27ae60; font-weight:bold;">★ 保守演算法：每年只滾動一次，且假設「每年年初一次領出整年預算」。</span>
             </div>
         </div>
@@ -719,40 +757,58 @@
     <div id="result-area" class="result-box" style="display: none;">
         <div class="result-header">
             <div class="purchasing-power-badge">✨ 金額皆已換算為「今日購買力」</div>
-            <div id="result-summary"></div>
+            <div id="result-summary">
+                <h3 style="margin:5px 0; color:#7f8c8d">55 歲累積資產：288 萬</h3>
+                <h2 style="margin:0; color:#27ae60">今日購買力：248 萬</h2>
+            </div>
             <div id="house-impact-msg" style="margin-top:15px; padding:10px; background:#fce4ec; border-radius:8px; color:#c2185b; display:none; font-size:0.9em; line-height:1.5;"></div>
             <div id="deficit-warning" style="display:none; margin-top:15px; padding:12px 15px; background:#fdecea; border:1px solid #f5b7b1; border-radius:8px; color:#c0392b; font-size:0.9em; line-height:1.6; text-align:left;"></div>
             <div class="hint" style="margin-top:10px;">(這代表：雖然帳面上金額很大，但實際能買到的東西，相當於現在這個金額的價值)</div>
         </div>
         
-        <div id="comparison-block" class="comparison-box" style="display:none;">
+        <div id="comparison-block" class="comparison-box" style="display: flex;">
             <div>
                 <div class="comp-label">傳統平滑提領法 (固定花費)</div>
                 <div class="comp-note" id="comp-note-text">每月可花 (實質購買力)</div>
             </div>
             <div class="vs-badge">VS</div>
             <div style="text-align:right;">
-                <div class="comp-val" id="flat-val">$0</div>
+                <div class="comp-val" id="flat-val">$10,096</div>
                 <div class="comp-note">每月可花 (實質購買力)</div>
             </div>
         </div>
 
-        <div id="dwz-section-title" class="dwz-section-title" style="display:none;">
+        <div id="dwz-section-title" class="dwz-section-title" style="display: flex;">
             👇 Die With Zero 建議提領法 (3-2-1 階梯式)
         </div>
 
-        <div class="phase-container" id="phase-container"></div>
+        <div class="phase-container" id="phase-container">
+            <div class="phase-card p-gold">
+                <div class="p-title">🚀 黃金期 (55 - 65歲)</div>
+                <div class="p-amt">$13,141</div>
+                <div class="p-desc">每月可花</div>
+            </div>
+            <div class="phase-card p-silver">
+                <div class="p-title">🚢 白銀期 (65 - 75歲)</div>
+                <div class="p-amt">$8,761</div>
+                <div class="p-desc">每月可花</div>
+            </div>
+            <div class="phase-card p-bronze">
+                <div class="p-title">🏡 慢活期 (75 - 85歲)</div>
+                <div class="p-amt">$4,380</div>
+                <div class="p-desc">每月可花</div>
+            </div></div>
 
-        <div id="acc-chart-container" style="display:none;">
+        <div id="acc-chart-container" style="display: block;">
             <div class="chart-header">📈 第一階段：資產累積預測 (至退休)</div>
             <div class="chart-wrap">
-                <canvas id="chartAcc"></canvas>
+                <canvas id="chartAcc" style="box-sizing: border-box; display: block; height: 350px; width: 836px;" width="836" height="350"></canvas>
             </div>
         </div>
 
         <div class="chart-header">📉 第二階段：退休後提領與消費 (Die With Zero vs 傳統)</div>
         <div class="chart-wrap">
-            <canvas id="chartDec"></canvas>
+            <canvas id="chartDec" style="box-sizing: border-box; display: block; height: 350px; width: 836px;" width="836" height="350"></canvas>
         </div>
 
         <div class="hint" style="text-align:center; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
@@ -796,6 +852,8 @@
     </div>
 </div>
 
+<div id="floating-tooltip" role="tooltip"></div>
+
 <script>
     // --- Data Definitions ---
     const ASSET_OPTIONS = [
@@ -804,7 +862,7 @@
         { id: '00631L', name: '00631L (50正2)', rate: 15.0 },
         { id: 'VOO', name: 'VOO (標普500)', rate: 8.0 },
         { id: 'QQQ', name: 'QQQ (那斯達克)', rate: 10.0 },
-        { id: 'QLD', name: 'QLD (那斯達克2倍)', rate: 12.0 },
+        { id: 'QLD', name: 'QLD (那斯達克2倍)', rate: 15.0 },
         { id: 'TQQQ', name: 'TQQQ (那斯達克3倍)', rate: 15.0 },
         { id: 'CASH', name: '現金 (即定存)', rate: 1.0 },
         { id: 'BOND', name: '美股短債 (SGOV/SHV)', rate: 3.5 }
@@ -815,7 +873,60 @@
         generatePortfolioRows('r-portfolio-table', 'r-port');       // 退休模式
         generatePortfolioRows('y-portfolio-table', 'y-port');       // 年輕人 - 累積期
         generatePortfolioRows('y-dec-portfolio-table', 'y-dec-port'); // 年輕人 - 提領期 (New)
+        initTooltips();
     };
+
+    // --- Floating Tooltip Logic ---
+    let tooltipTimer = null;
+    function initTooltips() {
+        const tip = document.getElementById('floating-tooltip');
+        if (!tip) return;
+
+        function showTooltip(target) {
+            const text = target.getAttribute('data-tooltip');
+            if (!text) return;
+            tip.textContent = text;
+            tip.classList.add('visible');
+
+            const rect = target.getBoundingClientRect();
+            const tipRect = tip.getBoundingClientRect();
+            const pad = 12;
+
+            let left = rect.left + (rect.width - tipRect.width) / 2;
+            left = Math.max(pad, Math.min(left, window.innerWidth - tipRect.width - pad));
+
+            let top = rect.top - tipRect.height - 10;
+            if (top < pad) {
+                top = rect.bottom + 10;
+            }
+
+            tip.style.left = `${left}px`;
+            tip.style.top = `${top}px`;
+        }
+
+        function hideTooltip() {
+            tip.classList.remove('visible');
+        }
+
+        document.querySelectorAll('.tag[data-tooltip]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                clearTimeout(tooltipTimer);
+                showTooltip(el);
+            });
+            el.addEventListener('mouseleave', hideTooltip);
+            el.addEventListener('click', () => {
+                // 行動裝置點擊選項時也顯示說明，數秒後自動收起
+                clearTimeout(tooltipTimer);
+                showTooltip(el);
+                tooltipTimer = setTimeout(hideTooltip, 4000);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.tag[data-tooltip]')) hideTooltip();
+        });
+        window.addEventListener('scroll', hideTooltip, { passive: true });
+    }
 
     // --- UI Helpers ---
     function switchMode(mode) {
@@ -1467,6 +1578,7 @@
         });
     }
     </script>
+
 
 
 
